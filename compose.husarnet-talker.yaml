@@ -1,17 +1,19 @@
+x-husarnet-config:
+  &husarnet-config
+  network_mode: service:husarnet
+  depends_on: 
+    husarnet: { condition: service_healthy }
+
 name: husarnet_talker
 services:
   discovery-server:
     image: ros:iron-ros-core
-    network_mode: service:husarnet
-    depends_on: 
-      husarnet: { condition: service_healthy }
+    <<: *husarnet-config
     command: fastdds discovery -i 0 -l husarnet-local -p 11811
 
   talker:
     build: .
-    network_mode: service:husarnet
-    depends_on: 
-      husarnet: { condition: service_healthy }
+    <<: *husarnet-config
     environment:
       - ROS_DISCOVERY_SERVER=husarnet-local:11811
     command: ros2 run demo_nodes_cpp talker

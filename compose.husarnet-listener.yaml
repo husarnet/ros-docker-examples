@@ -1,10 +1,14 @@
+x-husarnet-config:
+  &husarnet-config
+  network_mode: service:husarnet
+  depends_on: 
+    husarnet: { condition: service_healthy } # husarnet service is healthy if all hosts listed in WAIT_HOSTNAMES are reachable
+
 name: husarnet_listener
 services:
   listener:
     build: .
-    network_mode: service:husarnet
-    depends_on: 
-      husarnet: { condition: service_healthy } # husarnet service is healthy if all hosts listed in WAIT_HOSTNAMES are reachable
+    <<: *husarnet-config
     environment:
       - ROS_DISCOVERY_SERVER=talker-host:11811
     command: ros2 run demo_nodes_cpp listener
