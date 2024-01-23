@@ -1,0 +1,8 @@
+services:
+  talker:
+    build: .
+    command: ros2 run demo_nodes_cpp talker
+
+  listener:
+    build: .
+    command: ros2 run demo_nodes_cpp listener

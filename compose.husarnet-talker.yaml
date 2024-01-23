@@ -1,0 +1,33 @@
+name: husarnet_talker
+services:
+  discovery-server:
+    image: ros:iron-ros-core
+    network_mode: service:husarnet
+    depends_on: 
+      husarnet: { condition: service_healthy }
+    command: fastdds discovery -i 0 -l husarnet-local -p 11811
+
+  talker:
+    build: .
+    network_mode: service:husarnet
+    depends_on: 
+      husarnet: { condition: service_healthy }
+    environment:
+      - ROS_DISCOVERY_SERVER=husarnet-local:11811
+    command: ros2 run demo_nodes_cpp talker
+
+  husarnet:
+    image: husarnet/husarnet:latest
+    volumes:
+      - /var/lib/husarnet
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - HOSTNAME=talker-host
+      - JOINCODE
+      - HUSARNET_DEBUG=1
+      - WAIT_HOSTNAMES=talker-host
